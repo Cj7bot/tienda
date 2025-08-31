@@ -14,7 +14,7 @@
 <div class="max-w-5xl mx-auto px-4 py-8">
   <div class="flex items-center justify-between mb-8">
     <h1 class="text-2xl font-semibold text-gray-800">
-      Cart ({totalProductos} {totalProductos === 1 ? 'producto' : 'productos'})
+      Cart ({totalProductos} {totalProductos === 1 ? 'product' : 'products'})
     </h1>
   </div>
 

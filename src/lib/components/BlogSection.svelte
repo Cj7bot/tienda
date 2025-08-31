@@ -3,7 +3,7 @@
     title: 'Discover the Benefits of Superfoods',
     summary:
       "Discover how superfoods can enhance your health and well-being. From boosting immunity to improving digestion, these nutrient-rich foods are a game-changer for your diet.",
-    link: '#'
+    link: '/blog/superfoods'
   };
 
   const blogPosts = [
@@ -39,7 +39,7 @@
     <div class="bg-white/10 backdrop-blur rounded-lg p-8">
       <h3 class="text-3xl font-serif italic mb-4">{featuredPost.title}</h3>
       <p class="mb-4">{featuredPost.summary}</p>
-      <a href={featuredPost.link} class="underline font-semibold">Continue reading...</a>
+      <a href={featuredPost.link} class="underline font-semibold">Continue Reading</a>
     </div>
 
     <!-- Blog Grid -->

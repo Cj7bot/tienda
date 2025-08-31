@@ -609,7 +609,7 @@
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 px-3 py-2 appearance-none pr-8"
             >
               <option value="">Select a State</option>
-              <option value="lima">Florida</option>
+              <option value="Florida">Florida</option>
             </select>
             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
               <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -629,7 +629,7 @@
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 px-3 py-2 appearance-none pr-8"
             >
               <option value="">Select a Province</option>
-              <option value="lima">Miami</option>
+              <option value="Miami">Miami</option>
             </select>
             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
               <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -648,8 +648,8 @@
               bind:value={distrito}
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 px-3 py-2 appearance-none pr-8"
             >
-              <option value="">Select a Street</option>
-              <option value="miraflores">Fort Lauderdale</option>
+              <option value="">Select a District</option>
+              <option value="Fort Lauderdale">Fort Lauderdale</option>
             </select>
             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
               <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
