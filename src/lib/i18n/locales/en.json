@@ -1,0 +1,74 @@
+{
+  "header": {
+    "freeShipping": "FREE SHIPPING ON ALL ORDERS | N.AMERICA + EUROPE",
+    "nav": {
+      "home": "Home",
+      "shop": "Shop",
+      "about": "About",
+      "distributors": "Distributors",
+      "faq": "FAQ",
+      "blog": "Blog",
+      "contact": "Contact"
+    },
+    "user": {
+      "hello": "Hello",
+      "profile": "My profile",
+      "login": "Login",
+      "cart": "Shopping cart",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu"
+    },
+    "language": {
+      "change": "Change language / Cambiar idioma",
+      "current": "ES",
+      "full": "Language: English → Español"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Try again"
+  },
+  "products": {
+    "title": "Browse Our Latest Superfoods",
+    "filters": "Filters",
+    "closeFilters": "Close filters",
+    "applyFilters": "Apply Filters",
+    "addToCart": "Add to Cart",
+    "freeShipping": "Free Shipping",
+    "inStock": "In Stock",
+    "outOfStock": "Out of Stock", 
+    "noProducts": "No products found",
+    "categories": {
+      "title": "Categories",
+      "all": "All",
+      "superfoodPowders": "Superfood Powders",
+      "capsules": "Capsules",
+      "diabeticControl": "Diabetic Control",
+      "prostateBalance": "Prostate Balance",
+      "intestinalWellness": "Intestinal Wellness",
+      "maleSupplements": "Male Supplements",
+      "femaleSupplements": "Female Supplements",
+      "veganProteinPowders": "Vegan Protein Powders",
+      "bakingFlours": "Baking Flours",
+      "fruitPowders": "Fruit Powders",
+      "herbalTeas": "Herbal Teas",
+      "wholesale": "Wholesale for Retailers",
+      "naturalSweeteners": "Natural Sweeteners",
+      "herbalPowders": "Herbal Powders",
+      "superfood_powders": "Superfood Powders",
+      "diabetic_control": "Diabetic Control",
+      "prostate_balance": "Prostate Balance",
+      "intestinal_wellness": "Intestinal Wellness",
+      "male_supplements": "Male Supplements",
+      "female_supplements": "Female Supplements",
+      "vegan_protein_powders": "Vegan Protein Powders",
+      "baking_flours": "Baking Flours",
+      "fruit_powders": "Fruit Powders",
+      "herbal_teas": "Herbal Teas",
+      "wholesale_for_retailers": "Wholesale for Retailers",
+      "natural_sweeteners": "Natural Sweeteners",
+      "herbal_powders": "Herbal Powders"
+    }
+  }
+}

@@ -55,8 +55,9 @@
 
     <form on:submit|preventDefault={handleRegister} class="space-y-4">
       <div>
-        <label class="block text-sm font-medium text-gray-700">Nombre completo</label>
+        <label for="nombre" class="block text-sm font-medium text-gray-700">Full Name</label>
         <input
+          id="nombre"
           type="text"
           bind:value={nombre}
           placeholder="John Doe"
@@ -66,8 +67,9 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700">Correo electrónico</label>
+        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
         <input
+          id="email"
           type="email"
           bind:value={email}
           placeholder="correo@ejemplo.com"
@@ -77,9 +79,10 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700">Contraseña</label>
+        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
         <div class="relative">
           <input
+            id="password"
             type={showPassword ? "text" : "password"}
             bind:value={password}
             placeholder="••••••••"

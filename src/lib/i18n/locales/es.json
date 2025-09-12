@@ -1,0 +1,74 @@
+{
+  "header": {
+    "freeShipping": "ENVÍO GRATIS EN TODOS LOS PEDIDOS | N.AMÉRICA + EUROPA",
+    "nav": {
+      "home": "Inicio",
+      "shop": "Tienda",
+      "about": "Acerca de",
+      "distributors": "Distribuidores",
+      "faq": "Preguntas Frecuentes",
+      "blog": "Blog",
+      "contact": "Contacto"
+    },
+    "user": {
+      "hello": "Hola",
+      "profile": "Mi perfil",
+      "login": "Iniciar sesión",
+      "cart": "Carrito de compras",
+      "openMenu": "Abrir menú",
+      "closeMenu": "Cerrar menú"
+    },
+    "language": {
+      "change": "Cambiar idioma / Change language",
+      "current": "EN",
+      "full": "Idioma: Español → English"
+    }
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "retry": "Intentar de nuevo"
+  },
+  "products": {
+    "title": "Explora Nuestros Últimos Superalimentos",
+    "filters": "Filtros",
+    "closeFilters": "Cerrar filtros",
+    "applyFilters": "Aplicar Filtros",
+    "addToCart": "Añadir al Carrito",
+    "freeShipping": "Envío Gratis", 
+    "inStock": "En Stock",
+    "outOfStock": "Agotado",
+    "noProducts": "No se encontraron productos",
+    "categories": {
+      "title": "Categorías",
+      "all": "Todos",
+      "superfoodPowders": "Polvos de Superalimentos",
+      "capsules": "Cápsulas",
+      "diabeticControl": "Control Diabético",
+      "prostateBalance": "Balance de Próstata",
+      "intestinalWellness": "Bienestar Intestinal",
+      "maleSupplements": "Suplementos Masculinos",
+      "femaleSupplements": "Suplementos Femeninos",
+      "veganProteinPowders": "Polvos de Proteína Vegana",
+      "bakingFlours": "Harinas para Hornear",
+      "fruitPowders": "Polvos de Frutas",
+      "herbalTeas": "Tés Herbales",
+      "wholesale": "Mayoreo para Minoristas",
+      "naturalSweeteners": "Endulzantes Naturales",
+      "herbalPowders": "Polvos Herbales",
+      "superfood_powders": "Polvos de Superalimentos",
+      "diabetic_control": "Control Diabético",
+      "prostate_balance": "Balance de Próstata",
+      "intestinal_wellness": "Bienestar Intestinal",
+      "male_supplements": "Suplementos Masculinos",
+      "female_supplements": "Suplementos Femeninos",
+      "vegan_protein_powders": "Polvos de Proteína Vegana",
+      "baking_flours": "Harinas para Hornear",
+      "fruit_powders": "Polvos de Frutas",
+      "herbal_teas": "Tés Herbales",
+      "wholesale_for_retailers": "Mayoreo para Minoristas",
+      "natural_sweeteners": "Endulzantes Naturales",
+      "herbal_powders": "Polvos Herbales"
+    }
+  }
+}

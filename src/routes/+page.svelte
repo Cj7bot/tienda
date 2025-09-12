@@ -8,33 +8,6 @@
     '/slider4.avif'
   ];
 
-  const infoCards = [
-    {
-      title: 'PURE INKA FOODS',
-      text: 'Premium natural ingredients from the Andes and Amazon.',
-      image: '/aguajecapsulas1.avif'
-    },
-    {
-      title: 'KACHAVA SUPERFOODS',
-      text: 'Superfood blends rooted in Incan and Mayan traditions.',
-      image: '/cacao1.avif'
-    },
-    {
-      title: 'PREMIUM SUPPLIER',
-      text: 'We export fresh superfoods directly to global markets.',
-      image: '/arandanos1.avif'
-    },
-    {
-      title: 'FRUIT POWDER SUPPLIER',
-      text: 'We export fresh superfoods directly to global markets.',
-      image: '/arandanos1.avif'
-    },
-    {
-      title: 'PREMIUM SUPPLIER',
-      text: 'We export fresh superfoods directly to global markets.',
-      image: '/arandanos1.avif'
-    }
-  ];
 </script>
 
 <section class="pt-0">
@@ -58,7 +31,7 @@
       We specialize in the production of fruit powders, vegetable powders, dried fruits & nuts, natural supplements, ancient
       grain superfoods, herbal powders, coffee and teas, spices, gluten free powders, root vegetables, chocolate and cacao.
     </p>
-    <a href="#" class="inline-block bg-yellow-600 text-white px-4 py-2 rounded font-semibold hover:bg-yellow-700">Read More</a>
+    <button class="inline-block bg-yellow-600 text-white px-4 py-2 rounded font-semibold hover:bg-yellow-700">Read More</button>
   </section>
 
   <!-- Premium Superfoods Section -->
