@@ -21,8 +21,8 @@ import { API_URL } from '$lib/config/api';
 export class ProductsService {
   static async getProducts(): Promise<ApiResponse<Product[]>> {
     try {
-      console.log('Fetching from:', `${API_URL}/products`);
-      const response = await fetch(`${API_URL}/products`, {
+      console.log('Fetching from:', `${API_URL}/catalog/by-category?category=all`);
+      const response = await fetch(`${API_URL}/catalog/by-category?category=all`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ export class ProductsService {
       const data = await response.json();
       console.log('Raw API response:', data);
       
-      const products = Array.isArray(data) ? data : data.member || [];
+      const products = Array.isArray(data) ? data : data.products || data.member || [];
       console.log('Processed products:', products.length);
       
       return {

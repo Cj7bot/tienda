@@ -11,9 +11,9 @@
   }
 
   // Construir la URL completa de la imagen
-  $: imageUrl = product.imagen.startsWith('http') 
-    ? product.imagen 
-    : `${API_URL.replace('/api', '')}/uploads/${product.imagen}`;
+  $: imageUrl = product.imagen?.startsWith('http')
+    ? product.imagen
+    : `${API_URL.replace('/api', '')}${product.imagen}`;
     
   // Imagen por defecto si falla la carga
   function handleImageError(event: Event) {
@@ -42,7 +42,7 @@
   </div>
   <div class="mt-4 flex-1">
     <h3 class="text-sm font-medium text-gray-800 mb-1">{product.nombre}</h3>
-    <p class="text-green-600 font-semibold">${product.precio.toFixed(2)}</p>
+    <p class="text-green-600 font-semibold">${Number(product.precio).toFixed(2)}</p>
   </div>
   <button 
     on:click={handleAddToCart}

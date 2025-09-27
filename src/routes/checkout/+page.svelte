@@ -1,9 +1,8 @@
 <script lang="ts">
   import { cart, totalItems, subtotal } from '$lib/stores/cartStore.js';
   import { goto } from '$app/navigation';
-  // Comentamos temporalmente las importaciones del backend
-  /*import { processPayment, validateAddress, getDeliveryOptions, calculateShipping } from '$lib/services/checkoutService';
-  import type { Address, CheckoutData } from '$lib/types/checkout';*/
+  import { processPayment, validateAddress, getDeliveryOptions, calculateShipping } from '$lib/services/checkoutService';
+  import type { Address, CheckoutData } from '$lib/types/checkout';
   import { onMount } from 'svelte';
   
   // Reactive subscriptions
@@ -43,14 +42,17 @@
   let availableDeliveryOptions: Array<{id: string, name: string, description: string}> = [];
 
   // Load delivery options on mount
-  /*onMount(async () => {
+  onMount(async () => {
+    isLoading = true;
     try {
       availableDeliveryOptions = await getDeliveryOptions();
     } catch (error) {
       console.error('Error al cargar opciones de envío:', error);
       errorMessage = 'No se pudieron cargar las opciones de envío';
+    } finally {
+      isLoading = false;
     }
-  });*/
+  });
 
   async function handleDeliveryOptionClick(option: string) {
     selectedDeliveryOption = option;
@@ -112,8 +114,8 @@
 
   async function handleConfirmAddress() {
     if (departamento && provincia && distrito && calle && numero) {
-      // Comentamos temporalmente la validación con el backend
-      /*const addressData: Address = {
+      isLoading = true;
+      const addressData: Address = {
         departamento,
         provincia,
         distrito,
@@ -124,7 +126,7 @@
       try {
         // Validar la dirección con el backend
         await validateAddress(addressData);
-        
+
         // Calcular costos de envío
         const shippingResult = await calculateShipping(addressData);
         shippingCost = shippingResult.cost;
@@ -136,13 +138,9 @@
       } catch (error) {
         console.error('Error al validar la dirección:', error);
         errorMessage = 'Error al validar la dirección. Por favor, inténtalo de nuevo.';
-      }*/
-
-      // Por ahora, simplemente confirmamos la dirección
-      addressConfirmed = true;
-      confirmedAddress = `${calle} ${numero}, ${distrito}, ${provincia}, ${departamento}`;
-      showAddressModal = false;
-      errorMessage = '';
+      } finally {
+        isLoading = false;
+      }
     }
   }
 
@@ -160,8 +158,7 @@
       errorMessage = '';
 
       try {
-        // Comentamos temporalmente el procesamiento de pago
-        /*const checkoutData: CheckoutData = {
+        const checkoutData: CheckoutData = {
           address: {
             departamento,
             provincia,
@@ -176,7 +173,7 @@
             cardExpiry,
             cardCVV
           } : undefined,
-          items: $cart.map(item => ({
+          items: $cart.map((item: {id: string, nombre: string, precio: number, imagen: string, cantidad: number}) => ({
             id: item.id,
             cantidad: item.cantidad,
             precio: item.precio
@@ -188,10 +185,8 @@
           cmrTermsAccepted
         };
 
-        await processPayment(checkoutData);*/
-        
-        // Simulamos un proceso de pago exitoso
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await processPayment(checkoutData);
+
         showPurchaseSuccess = true;
         // Cerramos el popup después de 3 segundos y redirigimos al carrito
         setTimeout(() => {
