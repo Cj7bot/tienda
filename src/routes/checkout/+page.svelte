@@ -30,13 +30,106 @@
   let cardCVV = '';
   let showSuccessPopup = false;
   let cardAdded = false;
+  let cardBrand: 'visa' | 'mastercard' | 'amex' | 'discover' | null = null;
 
   // Form data
+  let pais = '';
   let departamento = '';
   let provincia = '';
   let distrito = '';
   let calle = '';
   let numero = '';
+
+  // Location data for dynamic dropdowns
+  interface LocationData {
+    [country: string]: {
+      [department: string]: {
+        [province: string]: string[];
+      };
+    };
+  }
+
+  const locations: LocationData = {
+    'Perú': {
+      'Amazonas': {},
+      'Ancash': {},
+      'Apurímac': {},
+      'Arequipa': {
+        'Arequipa': ['Arequipa', 'Cayma', 'Yanahuara'],
+        'Camaná': ['Camaná', 'Samuel Pastor']
+      },
+      'Ayacucho': {},
+      'Cajamarca': {},
+      'Callao': {},
+      'Cusco': {},
+      'Huancavelica': {},
+      'Huánuco': {},
+      'Ica': {},
+      'Junín': {},
+      'La Libertad': {},
+      'Lambayeque': {},
+      'Lima': {
+        'Lima': ['Miraflores', 'San Isidro', 'Barranco', 'Santiago de Surco'],
+        'Cañete': ['San Vicente de Cañete', 'Imperial', 'Mala']
+      },
+      'Loreto': {},
+      'Madre de Dios': {},
+      'Moquegua': {},
+      'Pasco': {},
+      'Piura': {},
+      'Puno': {},
+      'San Martín': {},
+      'Tacna': {},
+      'Tumbes': {},
+      'Ucayali': {}
+    },
+    'Estados Unidos': {
+      'Florida': {
+        'Miami-Dade': ['Miami', 'Miami Beach', 'Hialeah', 'Coral Gables'],
+        'Broward': ['Fort Lauderdale', 'Hollywood', 'Pembroke Pines']
+      },
+      'California': {
+        'Los Angeles': ['Los Angeles', 'Santa Monica', 'Beverly Hills'],
+        'San Francisco': ['San Francisco']
+      }
+    }
+  };
+
+  // Reactive lists for dropdowns
+  let paises = Object.keys(locations);
+  let departamentos: string[] = [];
+  let provincias: string[] = [];
+  let distritos: string[] = [];
+
+  $: {
+    if (pais && locations[pais]) {
+      departamentos = Object.keys(locations[pais]);
+    } else {
+      departamentos = [];
+    }
+    departamento = '';
+    provincia = '';
+    distrito = '';
+  }
+
+  $: {
+    if (departamento && locations[pais] && locations[pais][departamento]) {
+      provincias = Object.keys(locations[pais][departamento]);
+    } else {
+      provincias = [];
+    }
+    provincia = '';
+    distrito = '';
+  }
+
+  $: {
+    if (provincia && locations[pais] && locations[pais][departamento] && locations[pais][departamento][provincia]) {
+      distritos = locations[pais][departamento][provincia];
+    } else {
+      distritos = [];
+    }
+    distrito = '';
+  }
 
   // Delivery options
   let availableDeliveryOptions: Array<{id: string, name: string, description: string}> = [];
@@ -77,6 +170,19 @@
       parts.push(value.slice(i, i + 4));
     }
     cardNumber = parts.join(' ');
+
+    // Detectar la marca de la tarjeta
+    if (/^4/.test(value)) {
+      cardBrand = 'visa';
+    } else if (/^5[1-5]/.test(value)) {
+      cardBrand = 'mastercard';
+    } else if (/^3[47]/.test(value)) {
+      cardBrand = 'amex';
+    } else if (/^6(?:011|5)/.test(value)) {
+      cardBrand = 'discover';
+    } else {
+      cardBrand = null;
+    }
   }
 
   function formatExpiry(event: Event) {
@@ -369,7 +475,7 @@
                 <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd" />
               </svg>
             </div>
-            <div class="flex-1">
+            <div class="flex-1 text-left">
               <span class="font-medium text-gray-900">Credit Card</span>
               {#if cardAdded}
                 <p class="text-sm text-gray-500 mt-1">**** **** **** {cardNumber.slice(-4)}</p>
@@ -384,14 +490,34 @@
                 <!-- Card Number -->
                 <div>
                   <label for="cardNumber" class="block text-sm font-medium text-gray-700 mb-1">Número de tarjeta</label>
-                  <input
-                    type="text"
-                    id="cardNumber"
-                    bind:value={cardNumber}
-                    on:input={formatCardNumber}
-                    placeholder="0000 0000 0000 0000"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 px-3 py-2"
-                  />
+                  <div class="relative mt-1">
+                    <input
+                      type="text"
+                      id="cardNumber"
+                      bind:value={cardNumber}
+                      on:input={formatCardNumber}
+                      placeholder="0000 0000 0000 0000"
+                      class="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 px-3 py-2 pl-12"
+                    />
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <!-- Visa -->
+                    {#if cardBrand === 'visa'}
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-auto" viewBox="0 0 24 24"><path fill="#1A1F71" d="M21.1 3.5H2.9c-.5 0-.9.4-.9.9v15.2c0 .5.4.9.9.9h18.2c.5 0 .9-.4.9-.9V4.4c0-.5-.4-.9-.9-.9z"/><path fill="#fff" d="M9.1 16.1h2.2l1.3-6.8H9.9c-.5 0-.9-.2-1.2-.5-.3-.3-.5-.7-.5-1.2s.2-.9.5-1.2c.3-.3.7-.5 1.2-.5h5.1l-1.3 6.8h2.6l1.3-6.8h-2.2c.2.3.4.6.4.9 0 .5-.2.9-.5 1.2-.3.3-.7.5-1.2.5H9.4l1.3-6.8h2.2L15.1 4h5.1c.5 0 .9.4.9.9s-.4.9-.9.9h-3.2l-.5 2.7h2.9c.5 0 .9.4.9.9s-.4.9-.9.9h-3.2l-1.3 6.8h3.2c.5 0 .9.4.9.9s-.4.9-.9.9h-5.1l1.3-6.8-2.6-2.7zM6.2 4h2.2l-1.3 6.8H4.5c-.5 0-.9-.4-.9-.9s.4-.9.9-.9h1.7z"/></svg>
+                    <!-- Mastercard -->
+                    {:else if cardBrand === 'mastercard'}
+                      <svg class="h-6 w-6" viewBox="0 0 38 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M35.16 0H2.84A2.84 2.84 0 000 2.84v18.32A2.84 2.84 0 002.84 24h32.32A2.84 2.84 0 0038 21.16V2.84A2.84 2.84 0 0035.16 0z" fill="#242424"/><circle cx="15" cy="12" r="7" fill="#EB001B"/><circle cx="23" cy="12" r="7" fill="#F79E1B"/><path d="M20 12a7.03 7.03 0 01-5 6.7V5.3a7.03 7.03 0 015 6.7z" fill="#FF5F00"/></svg>
+                    <!-- Amex -->
+                    {:else if cardBrand === 'amex'}
+                      <svg class="h-6 w-6" viewBox="0 0 38 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M35.16 0H2.84A2.84 2.84 0 000 2.84v18.32A2.84 2.84 0 002.84 24h32.32A2.84 2.84 0 0038 21.16V2.84A2.84 2.84 0 0035.16 0z" fill="#0077C8"/><path d="M11.6 15.2h4.8l2.4-4.8H14l-2.4 4.8zM26.4 8.8h-4.8L19.2 4h4.8l2.4 4.8zM11.6 8.8H14l2.4-4.8h-4.8L11.6 8.8zM19.2 20l2.4-4.8h4.8l-2.4 4.8h-4.8z" fill="#fff"/></svg>
+                    <!-- Discover -->
+                    {:else if cardBrand === 'discover'}
+                      <svg class="h-6 w-6" viewBox="0 0 38 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M35.16 0H2.84A2.84 2.84 0 000 2.84v18.32A2.84 2.84 0 002.84 24h32.32A2.84 2.84 0 0038 21.16V2.84A2.84 2.84 0 0035.16 0z" fill="#F68121"/><circle cx="19" cy="12" r="7" fill="#fff"/><path d="M19 5a7 7 0 00-6.32 4h12.64A7 7 0 0019 5z" fill="#D3D3D3"/></svg>
+                    <!-- Default Icon -->
+                    {:else}
+                      <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                    {/if}
+                    </div>
+                  </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
@@ -496,7 +622,7 @@
             />
             <span class="text-sm text-gray-600">
               Declaro que he leído y aceptado los
-              <a href="#" class="text-green-600 hover:underline">términos y condiciones</a>
+              <a href="/terminos-y-condiciones" class="text-green-600 hover:underline">términos y condiciones</a>
             </span>
           </label>
 
@@ -508,7 +634,7 @@
             />
             <span class="text-sm text-gray-600">
               Accept the
-              <a href="#" class="text-green-600 hover:underline">términos y condiciones</a>
+              <a href="/terminos-y-condiciones" class="text-green-600 hover:underline">términos y condiciones</a>
               access to CMR Points
             </span>
           </label>
@@ -594,62 +720,66 @@
       </div>
 
       <form class="space-y-4" on:submit|preventDefault={handleConfirmAddress}>
-        <!-- Departamento -->
+        <!-- País -->
         <div>
-          <label for="departamento" class="block text-sm font-medium text-gray-700 mb-1">Departamento</label>
+          <label for="pais" class="block text-sm font-medium text-gray-700 mb-1">País</label>
           <div class="relative">
-            <select 
-              id="departamento"
-              bind:value={departamento}
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 px-3 py-2 appearance-none pr-8"
-            >
-              <option value="">Select a State</option>
-              <option value="Florida">Florida</option>
+            <select id="pais" bind:value={pais} class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 px-3 py-2 appearance-none pr-8">
+              <option value="">Selecciona un país</option>
+              {#each paises as p}
+                <option value={p}>{p}</option>
+              {/each}
             </select>
             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
-              </svg>
+              <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Departamento -->
+        <div>
+          <label for="departamento" class="block text-sm font-medium text-gray-700 mb-1">Departamento / Estado</label>
+          <div class="relative">
+            <select id="departamento" bind:value={departamento} class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 px-3 py-2 appearance-none pr-8" disabled={!pais}>
+              <option value="">Selecciona un departamento/estado</option>
+              {#each departamentos as d}
+                <option value={d}>{d}</option>
+              {/each}
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+              <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
             </div>
           </div>
         </div>
 
         <!-- Provincia -->
         <div>
-          <label for="provincia" class="block text-sm font-medium text-gray-700 mb-1">Province</label>
+          <label for="provincia" class="block text-sm font-medium text-gray-700 mb-1">Provincia / Condado</label>
           <div class="relative">
-            <select 
-              id="provincia"
-              bind:value={provincia}
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 px-3 py-2 appearance-none pr-8"
-            >
-              <option value="">Select a Province</option>
-              <option value="Miami">Miami</option>
+            <select id="provincia" bind:value={provincia} class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 px-3 py-2 appearance-none pr-8" disabled={!departamento}>
+              <option value="">Selecciona una provincia/condado</option>
+              {#each provincias as p}
+                <option value={p}>{p}</option>
+              {/each}
             </select>
             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
-              </svg>
+              <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
             </div>
           </div>
         </div>
 
         <!-- Distrito -->
         <div>
-          <label for="distrito" class="block text-sm font-medium text-gray-700 mb-1">District</label>
+          <label for="distrito" class="block text-sm font-medium text-gray-700 mb-1">Distrito / Ciudad</label>
           <div class="relative">
-            <select 
-              id="distrito"
-              bind:value={distrito}
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 px-3 py-2 appearance-none pr-8"
-            >
-              <option value="">Select a District</option>
-              <option value="Fort Lauderdale">Fort Lauderdale</option>
+            <select id="distrito" bind:value={distrito} class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 px-3 py-2 appearance-none pr-8" disabled={!provincia}>
+              <option value="">Selecciona un distrito/ciudad</option>
+              {#each distritos as d}
+                <option value={d}>{d}</option>
+              {/each}
             </select>
             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
-              </svg>
+              <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
             </div>
           </div>
         </div>
@@ -708,8 +838,8 @@
           <path d="M15 22.2L9.8 17l-1.4 1.4L15 25l12-12-1.4-1.4z" fill="white"/>
         </svg>
       </div>
-      <h2 class="text-2xl font-bold text-gray-900 mb-2">¡COMPRA REALIZADA EXITOSAMENTE!</h2>
-      <p class="text-gray-600">Gracias por tu compra. Recibirás un correo con los detalles de tu pedido.</p>
+      <h2 class="text-2xl font-bold text-gray-900 mb-2">Pagado Correctamente</h2>
+      <p class="text-gray-600">Tu pago ha sido procesado con éxito. Gracias por tu compra.</p>
     </div>
   </div>
 {/if}

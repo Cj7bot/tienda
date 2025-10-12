@@ -1,25 +1,95 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { goto } from '$app/navigation';
+  import { nombre as nombreStore } from '$lib/stores/user.js';
 
   let id_usuario = "";
   let nombre = "";
   let email = "";
   let isEditing = false;
   let editedNombre = "";
+  let isLoading = true;
+  let isAuthenticated = false;
 
-  // Cargar datos del usuario al montar
-  onMount(() => {
-    id_usuario = localStorage.getItem("id_usuario") || "";
-    nombre = localStorage.getItem("nombre") || "";
-    email = localStorage.getItem("email") || "";
-    editedNombre = nombre;
+  // 🔒 SEGURIDAD: Verificar autenticación y cargar datos del backend
+  onMount(async () => {
+    await checkAuthAndLoadProfile();
   });
 
-  // Logout function
-  function logout() {
-    if (confirm("Are you sure you want to sign out?")) {
-      localStorage.clear();
-      window.location.href = "/login";
+  async function checkAuthAndLoadProfile() {
+    const token = sessionStorage.getItem('authToken');
+    
+    if (!token) {
+      // No hay token, redirigir al login
+      goto('/login');
+      return;
+    }
+
+    try {
+      // Verificar token y obtener datos del perfil desde el backend
+      const response = await fetch(`${import.meta.env.PUBLIC_API_URL || 'http://localhost:8000/api'}/profile`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        const userData = await response.json();
+        // Sanitizar datos del backend
+        id_usuario = String(userData.id || '').slice(0, 50);
+        nombre = String(userData.username || '').slice(0, 100);
+        email = String(userData.email || '').slice(0, 255);
+        editedNombre = nombre;
+        isAuthenticated = true;
+      } else if (response.status === 401) {
+        // Token inválido o expirado
+        sessionStorage.removeItem('authToken');
+        goto('/login');
+        return;
+      } else {
+        console.error('Error loading profile');
+        goto('/login');
+        return;
+      }
+    } catch (error) {
+      console.error('Network error:', error);
+      goto('/login');
+      return;
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  // 🔒 LOGOUT SEGURO: Invalidar token en el backend
+  async function logout() {
+    if (!confirm("Are you sure you want to sign out?")) {
+      return;
+    }
+
+    const token = sessionStorage.getItem('authToken');
+    
+    try {
+      // Invalidar token en el backend
+      if (token) {
+        await fetch(`${import.meta.env.PUBLIC_API_URL || 'http://localhost:8000/api'}/logout`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
+        });
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      // Limpiar datos locales
+      sessionStorage.removeItem('authToken');
+      nombreStore.set('');
+      goto('/login');
     }
   }
 
@@ -29,10 +99,46 @@
     editedNombre = nombre;
   }
 
-  function saveChanges() {
-    nombre = editedNombre;
-    localStorage.setItem("nombre", nombre);
-    isEditing = false;
+  // 🔒 GUARDAR CAMBIOS: Actualizar en el backend
+  async function saveChanges() {
+    if (!editedNombre.trim() || editedNombre.length > 100) {
+      alert('El nombre debe tener entre 1 y 100 caracteres.');
+      return;
+    }
+
+    const token = sessionStorage.getItem('authToken');
+    if (!token) {
+      goto('/login');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${import.meta.env.PUBLIC_API_URL || 'http://localhost:8000/api'}/profile/update`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({ 
+          username: editedNombre.trim() 
+        })
+      });
+
+      if (response.ok) {
+        nombre = editedNombre.trim();
+        nombreStore.set(nombre);
+        isEditing = false;
+      } else if (response.status === 401) {
+        sessionStorage.removeItem('authToken');
+        goto('/login');
+      } else {
+        alert('Error al actualizar el perfil. Inténtalo de nuevo.');
+      }
+    } catch (error) {
+      console.error('Update error:', error);
+      alert('Error de conexión. Inténtalo de nuevo.');
+    }
   }
 
   function cancelEditing() {
@@ -40,17 +146,49 @@
     isEditing = false;
   }
 
-  // Function to get initials
+  // 🔒 FUNCIÓN SEGURA: Obtener iniciales con sanitización
   function getInitials(name: string): string {
+    if (!name || typeof name !== 'string') return 'U';
+    
     return name
+      .trim()
       .split(" ")
+      .filter(word => word.length > 0)
       .map(word => word.charAt(0))
       .join("")
       .toUpperCase()
-      .slice(0, 2);
+      .replace(/[^A-Z]/g, '') // Solo letras
+      .slice(0, 2) || 'U';
+  }
+
+  // 🔒 FUNCIÓN DE SANITIZACIÓN
+  function sanitizeText(text: string): string {
+    if (!text || typeof text !== 'string') return '';
+    return text
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#x27;')
+      .replace(/\//g, '&#x2F;');
   }
 </script>
 
+<!-- 🔒 GUARD DE AUTENTICACIÓN -->
+{#if isLoading}
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-100">
+    <div class="text-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto mb-4"></div>
+      <p class="text-gray-600">Cargando perfil...</p>
+    </div>
+  </div>
+{:else if !isAuthenticated}
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-100">
+    <div class="text-center">
+      <p class="text-red-600 mb-4">Acceso no autorizado</p>
+      <a href="/login" class="text-amber-600 hover:underline">Ir al login</a>
+    </div>
+  </div>
+{:else}
 <div class="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 py-8">
   <div class="max-w-4xl mx-auto px-4">
     <!-- Header with breadcrumb -->
@@ -74,9 +212,9 @@
           <!-- User Info -->
           <div class="text-white">
             <h1 class="text-3xl font-bold mb-2">
-              {nombre || "User"}
+              {@html sanitizeText(nombre || "User")}
             </h1>
-            <p class="text-amber-100 text-lg">{email}</p>
+            <p class="text-amber-100 text-lg">{@html sanitizeText(email)}</p>
             <div class="flex items-center mt-3">
               <div class="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
               <span class="text-amber-100 text-sm">Active</span>
@@ -132,7 +270,7 @@
                 </div>
               {:else}
                 <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                  <span class="text-gray-800">{nombre || "No name"}</span>
+                  <span class="text-gray-800">{@html sanitizeText(nombre || "No name")}</span>
                   <button
                     on:click={startEditing}
                     class="text-amber-600 hover:text-amber-700 transition-colors"
@@ -151,7 +289,7 @@
             <div class="space-y-2">
               <label for="email-display" class="block text-sm font-medium text-gray-700">Email</label>
               <div id="email-display" class="p-4 bg-gray-50 rounded-lg">
-                <span class="text-gray-800">{email || "Not specified"}</span>
+                <span class="text-gray-800">{@html sanitizeText(email || "Not specified")}</span>
               </div>
             </div>
 
@@ -159,7 +297,7 @@
             <div class="space-y-2">
               <label for="user-id-display" class="block text-sm font-medium text-gray-700">User ID</label>
               <div id="user-id-display" class="p-4 bg-gray-50 rounded-lg font-mono text-sm">
-                <span class="text-gray-600">{id_usuario || "Not available"}</span>
+                <span class="text-gray-600">{@html sanitizeText(id_usuario || "Not available")}</span>
               </div>
             </div>
 
@@ -209,3 +347,4 @@
     </div>
   </div>
 </div>
+{/if}

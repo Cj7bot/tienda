@@ -40,7 +40,9 @@ cart.subscribe(persistCart);
  * @param {Object} producto - Producto con id, nombre, precio, imagen
  */
 export function addToCart(producto) {
-  if (!producto?.id || typeof producto.precio !== 'number') return;
+  const precioNumerico = typeof producto.precio === 'string' ? parseFloat(producto.precio) : producto.precio;
+
+  if (!producto?.id || typeof precioNumerico !== 'number' || isNaN(precioNumerico)) return;
 
   cart.update((items) => {
     const index = items.findIndex((item) => item.id === producto.id);
@@ -52,7 +54,7 @@ export function addToCart(producto) {
       };
       return updated;
     }
-    return [...items, { ...producto, cantidad: 1 }];
+    return [...items, { ...producto, precio: precioNumerico, cantidad: 1 }];
   });
 }
 

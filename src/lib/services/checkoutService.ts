@@ -3,17 +3,24 @@ import { API_URL } from '$lib/config/api';
 
 export async function processPayment(checkoutData: CheckoutData) {
   try {
-    const response = await fetch(`${API_URL}/checkout/process`, {
+    const token = sessionStorage.getItem('authToken');
+    if (!token) {
+      throw new Error('Usuario no autenticado');
+    }
+
+    const response = await fetch(`${API_URL}/checkout/process-order`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify(checkoutData),
-      credentials: 'include' // Para manejar cookies de sesión si es necesario
+      credentials: 'include'
     });
 
     if (!response.ok) {
-      throw new Error('Error al procesar el pago');
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Error al procesar el pago');
     }
 
     return await response.json();
@@ -24,62 +31,38 @@ export async function processPayment(checkoutData: CheckoutData) {
 }
 
 export async function validateAddress(addressData: any) {
-  try {
-    const response = await fetch(`${API_URL}/checkout/validate-address`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(addressData),
-      credentials: 'include'
-    });
+  console.warn('Usando datos mock para validación de dirección. Implementar el endpoint en el backend.', addressData);
 
-    if (!response.ok) {
-      throw new Error('Error al validar la dirección');
-    }
+  // Simulando una demora de la red
+  await new Promise(resolve => setTimeout(resolve, 500));
 
-    return await response.json();
-  } catch (error) {
-    console.error('Error al validar la dirección:', error);
-    throw error;
-  }
+  // Simular una respuesta exitosa
+  return { success: true, message: 'Dirección validada (mock)' };
 }
 
 export async function getDeliveryOptions() {
-  try {
-    const response = await fetch(`${API_URL}/checkout/delivery-options`, {
-      credentials: 'include'
-    });
+  console.warn('Usando datos mock para opciones de envío. Implementar el endpoint en el backend.');
 
-    if (!response.ok) {
-      throw new Error('Error al obtener opciones de envío');
-    }
+  // Simulando una demora de la red
+  await new Promise(resolve => setTimeout(resolve, 500));
 
-    return await response.json();
-  } catch (error) {
-    console.error('Error al obtener opciones de envío:', error);
-    throw error;
-  }
+  // Datos de prueba
+  const mockOptions = [
+    { id: 'pickup', name: 'Pickup', description: 'Select the place where you want to pick up your order' },
+    { id: 'express', name: 'Express Delivery', description: 'Add your address to know availability' },
+    { id: 'scheduled', name: 'Scheduled Delivery', description: 'Select a date and time for your delivery' },
+    { id: 'date-range', name: 'Date Range Delivery', description: 'Select a date range for your delivery' }
+  ];
+
+  return mockOptions;
 }
 
 export async function calculateShipping(addressData: any) {
-  try {
-    const response = await fetch(`${API_URL}/checkout/calculate-shipping`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(addressData),
-      credentials: 'include'
-    });
+  console.warn('Usando datos mock para cálculo de envío. Implementar el endpoint en el backend.', addressData);
 
-    if (!response.ok) {
-      throw new Error('Error al calcular costos de envío');
-    }
+  // Simulando una demora de la red
+  await new Promise(resolve => setTimeout(resolve, 500));
 
-    return await response.json();
-  } catch (error) {
-    console.error('Error al calcular costos de envío:', error);
-    throw error;
-  }
+  // Simular un costo de envío
+  return { cost: 0, currency: 'USD', message: 'Costo de envío calculado (mock)' };
 } 

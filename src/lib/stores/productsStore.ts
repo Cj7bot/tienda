@@ -35,16 +35,12 @@ export const filteredProducts = derived(
 );
 
 export async function loadProducts(): Promise<void> {
-  console.log('loadProducts called');
   productsStore.update(state => ({ ...state, loading: true, error: null }));
   
   try {
-    console.log('Calling ProductsService.getProducts()');
     const response: ApiResponse<Product[]> = await ProductsService.getProducts();
-    console.log('ProductsService response:', response);
     
     if (response.error) {
-      console.log('Response has error:', response.error);
       productsStore.update(state => ({
         ...state,
         loading: false,
@@ -53,7 +49,6 @@ export async function loadProducts(): Promise<void> {
       return;
     }
 
-    console.log('Products loaded successfully:', response.data.length, 'products');
     productsStore.update(state => ({
       ...state,
       products: response.data,

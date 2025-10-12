@@ -11,15 +11,22 @@
   }
 
   // Construir la URL completa de la imagen
-  $: imageUrl = product.imagen?.startsWith('http')
-    ? product.imagen
-    : `${API_URL.replace('/api', '')}${product.imagen}`;
+  $: imageUrl = product.imagen 
+    ? (product.imagen.startsWith('http') 
+        ? product.imagen 
+        : product.imagen) // En desarrollo, Vite proxy maneja /uploads automáticamente
+    : 'https://via.placeholder.com/300x200?text=Producto';
     
   // Imagen por defecto si falla la carga
   function handleImageError(event: Event) {
     const img = event.target as HTMLImageElement;
     img.src = 'https://via.placeholder.com/300x200?text=Producto';
   }
+
+  // Convertir precio a número para mostrar
+  $: precioNumerico = typeof product.precio === 'string' 
+    ? parseFloat(product.precio) 
+    : product.precio;
 </script>
 
 <div class="bg-white rounded-lg shadow hover:shadow-md transition p-4 flex flex-col">
@@ -42,7 +49,8 @@
   </div>
   <div class="mt-4 flex-1">
     <h3 class="text-sm font-medium text-gray-800 mb-1">{product.nombre}</h3>
-    <p class="text-green-600 font-semibold">${Number(product.precio).toFixed(2)}</p>
+    <p class="text-xs text-gray-500 mb-2 line-clamp-2">{product.descripcion}</p>
+    <p class="text-green-600 font-semibold">${precioNumerico.toFixed(2)}</p>
   </div>
   <button 
     on:click={handleAddToCart}

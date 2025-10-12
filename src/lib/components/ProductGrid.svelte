@@ -6,40 +6,17 @@
   import ErrorMessage from './ErrorMessage.svelte';
   import { products, loading, error, loadProducts, clearError } from '$lib/stores/productsStore';
 
-  console.log('ProductGrid component loaded');
-
-  // Llamar loadProducts inmediatamente para test
-  console.log('Calling loadProducts immediately');
-  loadProducts();
-
   onMount(() => {
-    console.log('ProductGrid mounted, calling loadProducts');
-    // loadProducts(); // Ya lo llamamos arriba
+    loadProducts();
   });
 
   function handleRetry() {
-    console.log('Retry clicked');
     clearError();
     loadProducts();
   }
-
-  // Debug reactive statements
-  $: console.log('Loading state:', $loading);
-  $: console.log('Error state:', $error);
-  $: console.log('Products:', $products);
 </script>
 
 <section class="md:col-span-3">
-  <!-- Debug button -->
-  <div class="mb-4">
-    <button 
-      on:click={() => loadProducts()} 
-      class="bg-blue-500 text-white px-4 py-2 rounded"
-    >
-      TEST: Load Products
-    </button>
-  </div>
-
   {#if $loading}
     <LoadingSpinner />
   {:else if $error}
