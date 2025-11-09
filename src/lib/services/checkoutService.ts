@@ -1,68 +1,52 @@
 import type { CheckoutData } from '$lib/types/checkout';
-import { API_URL } from '$lib/config/api';
 
+/**
+ * Procesa un pago simulado (MOCK).
+ * No requiere conexión con el backend.
+ */
 export async function processPayment(checkoutData: CheckoutData) {
-  try {
-    const token = sessionStorage.getItem('authToken');
-    if (!token) {
-      throw new Error('Usuario no autenticado');
-    }
-
-    const response = await fetch(`${API_URL}/checkout/process-order`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(checkoutData),
-      credentials: 'include'
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Error al procesar el pago');
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error en el proceso de pago:', error);
-    throw error;
+  // 1. Verificar si el usuario está autenticado (localmente)
+  const token = sessionStorage.getItem('authToken');
+  if (!token) {
+    throw new Error('Debes iniciar sesión para realizar una compra.');
   }
+
+  console.log('⚠️ Modo MOCK: Simulando procesamiento de pago...');
+  console.log('Checkout Data:', checkoutData);
+
+  // 2. Simular una demora de red de 1.5 segundos
+  await new Promise(resolve => setTimeout(resolve, 1500));
+
+  // 3. Simular una respuesta de pago exitosa
+  const mockResponse = {
+    success: true,
+    message: 'Pago procesado exitosamente (MOCK)',
+    order_id: Math.floor(Math.random() * 10000),
+  };
+
+  console.log('✅ MOCK Response:', mockResponse);
+  return mockResponse;
 }
 
+// --- Otras funciones MOCK para el checkout ---
+
 export async function validateAddress(addressData: any) {
-  console.warn('Usando datos mock para validación de dirección. Implementar el endpoint en el backend.', addressData);
-
-  // Simulando una demora de la red
+  console.warn('Usando datos mock para validación de dirección');
   await new Promise(resolve => setTimeout(resolve, 500));
-
-  // Simular una respuesta exitosa
   return { success: true, message: 'Dirección validada (mock)' };
 }
 
 export async function getDeliveryOptions() {
-  console.warn('Usando datos mock para opciones de envío. Implementar el endpoint en el backend.');
-
-  // Simulando una demora de la red
+  console.warn('Usando datos mock para opciones de envío');
   await new Promise(resolve => setTimeout(resolve, 500));
-
-  // Datos de prueba
-  const mockOptions = [
-    { id: 'pickup', name: 'Pickup', description: 'Select the place where you want to pick up your order' },
-    { id: 'express', name: 'Express Delivery', description: 'Add your address to know availability' },
-    { id: 'scheduled', name: 'Scheduled Delivery', description: 'Select a date and time for your delivery' },
-    { id: 'date-range', name: 'Date Range Delivery', description: 'Select a date range for your delivery' }
+  return [
+    { id: 'pickup', name: 'Pickup', description: 'Recoge en tienda' },
+    { id: 'express', name: 'Express Delivery', description: 'Entrega rápida' },
   ];
-
-  return mockOptions;
 }
 
 export async function calculateShipping(addressData: any) {
-  console.warn('Usando datos mock para cálculo de envío. Implementar el endpoint en el backend.', addressData);
-
-  // Simulando una demora de la red
+  console.warn('Usando datos mock para cálculo de envío');
   await new Promise(resolve => setTimeout(resolve, 500));
-
-  // Simular un costo de envío
-  return { cost: 0, currency: 'USD', message: 'Costo de envío calculado (mock)' };
-} 
+  return { cost: 5.99, currency: 'USD', message: 'Costo mock calculado' };
+}

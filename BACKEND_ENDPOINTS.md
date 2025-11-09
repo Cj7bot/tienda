@@ -130,6 +130,111 @@ public function register(Request $request, EntityManagerInterface $em): JsonResp
 }
 ```
 
+## 6. Crear Orden de Compra
+
+**Endpoint:** `POST /api/orders`
+**Headers:** `Authorization: Bearer {token}`
+
+**Descripción:** Crea una nueva orden de compra con los productos del carrito
+
+**Request Body:**
+```json
+{
+  "address": {
+    "departamento": "Lima",
+    "provincia": "Lima",
+    "distrito": "Miraflores",
+    "calle": "Av. Larco",
+    "numero": "123"
+  },
+  "deliveryOption": "express",
+  "paymentMethod": "credit",
+  "items": [
+    {
+      "id": "1",
+      "cantidad": 2,
+      "precio": 10.50
+    }
+  ],
+  "subtotal": 21.00,
+  "shipping": 0,
+  "total": 21.00
+}
+```
+
+**Response Success (201):**
+```json
+{
+  "success": true,
+  "message": "Orden creada exitosamente",
+  "order_id": 456,
+  "order_number": "ORD-2025-001"
+}
+```
+
+**Response Error (400):**
+```json
+{
+  "success": false,
+  "error": "Carrito vacío o datos inválidos"
+}
+```
+
+**Ejemplo de Controller en Symfony:**
+```php
+<?php
+// src/Controller/OrderController.php
+
+#[Route('/api/orders', methods: ['POST'])]
+public function createOrder(Request $request, EntityManagerInterface $em): JsonResponse
+{
+    $data = json_decode($request->getContent(), true);
+    
+    // Validar datos
+    if (!$data['items'] || count($data['items']) === 0) {
+        return $this->json(['success' => false, 'error' => 'Carrito vacío'], 400);
+    }
+    
+    // Obtener el usuario autenticado
+    $user = $this->getUser();
+    if (!$user) {
+        return $this->json(['success' => false, 'error' => 'Usuario no autenticado'], 401);
+    }
+    
+    // Crear nueva orden
+    $order = new Order();
+    $order->setCliente($user);
+    $order->setAddress(json_encode($data['address']));
+    $order->setDeliveryOption($data['deliveryOption']);
+    $order->setPaymentMethod($data['paymentMethod']);
+    $order->setSubtotal($data['subtotal']);
+    $order->setShipping($data['shipping']);
+    $order->setTotal($data['total']);
+    $order->setStatus('pending');
+    $order->setCreatedAt(new \DateTime());
+    
+    // Crear items de la orden
+    foreach ($data['items'] as $item) {
+        $orderItem = new OrderItem();
+        $orderItem->setOrder($order);
+        $orderItem->setProductId($item['id']);
+        $orderItem->setQuantity($item['cantidad']);
+        $orderItem->setPrice($item['precio']);
+        $em->persist($orderItem);
+    }
+    
+    $em->persist($order);
+    $em->flush();
+    
+    return $this->json([
+        'success' => true,
+        'message' => 'Orden creada exitosamente',
+        'order_id' => $order->getId(),
+        'order_number' => 'ORD-' . date('Y') . '-' . str_pad($order->getId(), 3, '0', STR_PAD_LEFT)
+    ], 201);
+}
+```
+
 ## Configuración CORS Requerida
 
 ```yaml

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { nombre } from '$lib/stores/user.js';
+  import { user } from '$lib/stores/auth.js';
   import { toggleLanguage } from '$lib/stores/language.js';
   import { _ } from 'svelte-i18n';
   import '$lib/i18n';
@@ -33,9 +33,9 @@
 
       <!-- Iconos y acciones -->
       <div class="flex items-center space-x-4 text-green-700 text-xl">
-        {#if $nombre}
+        {#if $user}
           <div class="flex items-center space-x-2 text-sm text-gray-700">
-            <span class="whitespace-nowrap">{$_('header.user.hello')}, {$nombre}</span>
+            <span class="whitespace-nowrap">{$_('header.user.hello')}, {$user.username}</span>
             <a href="/perfil" title={$_('header.user.profile')} class="hover:text-green-500" aria-label={$_('header.user.profile')}>
               <i class="fas fa-user"></i>
             </a>

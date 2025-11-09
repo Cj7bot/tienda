@@ -136,6 +136,16 @@
 
   // Load delivery options on mount
   onMount(async () => {
+    // Verificar si el usuario está autenticado
+    const token = sessionStorage.getItem('authToken');
+    if (!token) {
+      errorMessage = 'Debes iniciar sesión para realizar una compra';
+      setTimeout(() => {
+        goto('/login');
+      }, 2000);
+      return;
+    }
+
     isLoading = true;
     try {
       availableDeliveryOptions = await getDeliveryOptions();
@@ -208,13 +218,22 @@
 
   async function handleSubmitCard(e: Event) {
     e.preventDefault();
-    if (cardNumber && cardExpiry && cardCVV) {
+    // Pasarela ficticia: acepta cualquier dato de tarjeta
+    // Solo verificamos que los campos no estén vacíos
+    const cardNumberClean = cardNumber.replace(/\s/g, '');
+    
+    if (cardNumberClean.length >= 13 && cardExpiry.length >= 4 && cardCVV.length >= 3) {
       showSuccessPopup = true;
       cardAdded = true;
       setTimeout(() => {
         showSuccessPopup = false;
         showCreditCardForm = false;
       }, 2000);
+    } else {
+      errorMessage = 'Por favor, completa todos los campos de la tarjeta correctamente.';
+      setTimeout(() => {
+        errorMessage = '';
+      }, 3000);
     }
   }
 
@@ -293,15 +312,30 @@
 
         await processPayment(checkoutData);
 
+        // Limpiar el carrito después de una compra exitosa
+        cart.set([]);
+        
         showPurchaseSuccess = true;
-        // Cerramos el popup después de 3 segundos y redirigimos al carrito
+        // Cerramos el popup después de 3 segundos y redirigimos al home
         setTimeout(() => {
           showPurchaseSuccess = false;
-          goto('/carrito');
+          goto('/');
         }, 3000);
       } catch (error) {
         console.error('Error al procesar el pago:', error);
-        errorMessage = 'Error al procesar el pago. Por favor, inténtalo de nuevo.';
+        // Asegurar que el mensaje de error siempre sea un string
+        if (error instanceof Error) {
+          errorMessage = error.message;
+        } else if (typeof error === 'string') {
+          errorMessage = error;
+        } else {
+          errorMessage = 'Ocurrió un error inesperado. Revisa la consola.';
+        }
+
+        // Limpiar el mensaje de error después de 5 segundos
+        setTimeout(() => {
+          errorMessage = '';
+        }, 5000);
       } finally {
         isLoading = false;
       }
@@ -838,7 +872,7 @@
           <path d="M15 22.2L9.8 17l-1.4 1.4L15 25l12-12-1.4-1.4z" fill="white"/>
         </svg>
       </div>
-      <h2 class="text-2xl font-bold text-gray-900 mb-2">Pagado Correctamente</h2>
+      <h2 class="text-2xl font-bold text-gray-900 mb-2">Pago realizado Exitosamente</h2>
       <p class="text-gray-600">Tu pago ha sido procesado con éxito. Gracias por tu compra.</p>
     </div>
   </div>

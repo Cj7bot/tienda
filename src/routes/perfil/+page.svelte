@@ -1,32 +1,30 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { goto } from '$app/navigation';
-  import { nombre as nombreStore } from '$lib/stores/user.js';
+  import { auth, user } from '$lib/stores/auth.js';
 
-  let id_usuario = "";
-  let nombre = "";
-  let email = "";
+  let id_usuario = ""; // Asumimos que esto vendrá del perfil
+  let email = ""; // Asumimos que esto vendrá del perfil
   let isEditing = false;
   let editedNombre = "";
   let isLoading = true;
-  let isAuthenticated = false;
 
-  // 🔒 SEGURIDAD: Verificar autenticación y cargar datos del backend
+  // El estado de autenticación ahora lo maneja el store
+  $: isAuthenticated = $user !== null;
+  $: nombre = $user?.username || '';
+
   onMount(async () => {
-    await checkAuthAndLoadProfile();
+    await loadProfile();
   });
 
-  async function checkAuthAndLoadProfile() {
+  async function loadProfile() {
     const token = sessionStorage.getItem('authToken');
-    
     if (!token) {
-      // No hay token, redirigir al login
       goto('/login');
       return;
     }
 
     try {
-      // Verificar token y obtener datos del perfil desde el backend
       const response = await fetch(`${import.meta.env.PUBLIC_API_URL || 'http://localhost:8000/api'}/profile`, {
         method: 'GET',
         headers: {
@@ -38,59 +36,27 @@
 
       if (response.ok) {
         const userData = await response.json();
-        // Sanitizar datos del backend
         id_usuario = String(userData.id || '').slice(0, 50);
-        nombre = String(userData.username || '').slice(0, 100);
         email = String(userData.email || '').slice(0, 255);
-        editedNombre = nombre;
-        isAuthenticated = true;
-      } else if (response.status === 401) {
-        // Token inválido o expirado
-        sessionStorage.removeItem('authToken');
-        goto('/login');
-        return;
+        // El nombre ya se actualiza a través del store reactivo
+        editedNombre = $user?.username || '';
       } else {
-        console.error('Error loading profile');
-        goto('/login');
-        return;
+        auth.logout(); // Si falla, cerramos sesión
       }
     } catch (error) {
       console.error('Network error:', error);
-      goto('/login');
-      return;
+      auth.logout();
     } finally {
       isLoading = false;
     }
   }
 
-  // 🔒 LOGOUT SEGURO: Invalidar token en el backend
-  async function logout() {
+  async function handleLogout() {
     if (!confirm("Are you sure you want to sign out?")) {
       return;
     }
-
-    const token = sessionStorage.getItem('authToken');
-    
-    try {
-      // Invalidar token en el backend
-      if (token) {
-        await fetch(`${import.meta.env.PUBLIC_API_URL || 'http://localhost:8000/api'}/logout`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          credentials: 'include'
-        });
-      }
-    } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      // Limpiar datos locales
-      sessionStorage.removeItem('authToken');
-      nombreStore.set('');
-      goto('/login');
-    }
+    // La lógica de logout ya está en el store
+    auth.logout();
   }
 
   // Name editing functions
@@ -126,8 +92,8 @@
       });
 
       if (response.ok) {
-        nombre = editedNombre.trim();
-        nombreStore.set(nombre);
+        // Actualiza el store, lo que reactivamente cambiará el nombre mostrado
+        user.set({ username: editedNombre.trim() });
         isEditing = false;
       } else if (response.status === 401) {
         sessionStorage.removeItem('authToken');
@@ -333,7 +299,7 @@
             </a>
             
             <button
-              on:click={logout}
+              on:click={handleLogout}
               class="inline-flex items-center px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
             >
               <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
