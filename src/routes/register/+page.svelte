@@ -1,8 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  // This was causing issues in Playwright's test environment.
-  // For the purpose of the test, we can hardcode it, as we are mocking the API call anyway.
-  const API_URL = '/api';
+  import { API_URL } from '$lib/config/api';
   
   let nombre = "";
   let email = "";

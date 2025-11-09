@@ -101,19 +101,33 @@
   let provincias: string[] = [];
   let distritos: string[] = [];
 
-  // Lógica reactiva optimizada para las ubicaciones
-  $: departamentos = pais ? Object.keys(locations[pais] || {}) : [];
-  $: provincias = departamento ? Object.keys(locations[pais]?.[departamento] || {}) : [];
-  $: distritos = provincia ? locations[pais]?.[departamento]?.[provincia] || [] : [];
-
-  // Resetea las selecciones cuando cambia un nivel superior
-  $: if (pais) {
+  $: {
+    if (pais && locations[pais]) {
+      departamentos = Object.keys(locations[pais]);
+    } else {
+      departamentos = [];
+    }
     departamento = '';
-  }
-  $: if (departamento) {
     provincia = '';
+    distrito = '';
   }
-  $: if (provincia) {
+
+  $: {
+    if (departamento && locations[pais] && locations[pais][departamento]) {
+      provincias = Object.keys(locations[pais][departamento]);
+    } else {
+      provincias = [];
+    }
+    provincia = '';
+    distrito = '';
+  }
+
+  $: {
+    if (provincia && locations[pais] && locations[pais][departamento] && locations[pais][departamento][provincia]) {
+      distritos = locations[pais][departamento][provincia];
+    } else {
+      distritos = [];
+    }
     distrito = '';
   }
 
@@ -824,7 +838,7 @@
           <path d="M15 22.2L9.8 17l-1.4 1.4L15 25l12-12-1.4-1.4z" fill="white"/>
         </svg>
       </div>
-      <h2 class="text-2xl font-bold text-gray-900 mb-2">Pago realizado exitosamente</h2>
+      <h2 class="text-2xl font-bold text-gray-900 mb-2">Pagado Correctamente</h2>
       <p class="text-gray-600">Tu pago ha sido procesado con éxito. Gracias por tu compra.</p>
     </div>
   </div>

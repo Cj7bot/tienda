@@ -2,35 +2,32 @@ import type { CheckoutData } from '$lib/types/checkout';
 import { API_URL } from '$lib/config/api';
 
 export async function processPayment(checkoutData: CheckoutData) {
-  const token = sessionStorage.getItem('authToken');
-  if (!token) {
-    // Falla rápido si el usuario no está autenticado.
-    throw new Error('Usuario no autenticado');
-  }
+  try {
+    const token = sessionStorage.getItem('authToken');
+    if (!token) {
+      throw new Error('Usuario no autenticado');
+    }
 
-  const response = await fetch(`${API_URL}/checkout/process-order`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify(checkoutData),
-    credentials: 'include'
-  });
+    const response = await fetch(`${API_URL}/checkout/process-order`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(checkoutData),
+      credentials: 'include'
+    });
 
-  // Si la respuesta no es OK, lanza un error con el mensaje del backend.
-  if (!response.ok) {
-    try {
+    if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || 'Error al procesar el pago');
-    } catch (e) {
-      // Si el cuerpo del error no es JSON, lanza un error genérico.
-      throw new Error(`Error del servidor: ${response.statusText}`);
     }
-  }
 
-  // Si todo fue bien, devuelve la respuesta.
-  return await response.json();
+    return await response.json();
+  } catch (error) {
+    console.error('Error en el proceso de pago:', error);
+    throw error;
+  }
 }
 
 export async function validateAddress(addressData: any) {
