@@ -98,7 +98,7 @@
     <div class="mt-12 border-t border-gray-700 pt-6 text-sm flex flex-col sm:flex-row items-center justify-between">
       <p>© 2025 Pure Inka Foods. All rights reserved.</p>
       <p class="mt-2 sm:mt-0">
-        Designed with ❤️ by Your Company
+        Designed with ❤️ by mat
       </p>
     </div>
   </div>

@@ -212,9 +212,9 @@
           <!-- User Info -->
           <div class="text-white">
             <h1 class="text-3xl font-bold mb-2">
-              {@html sanitizeText(nombre || "User")}
+              {nombre || "User"}
             </h1>
-            <p class="text-amber-100 text-lg">{@html sanitizeText(email)}</p>
+            <p class="text-amber-100 text-lg">{email}</p>
             <div class="flex items-center mt-3">
               <div class="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
               <span class="text-amber-100 text-sm">Active</span>
@@ -270,7 +270,7 @@
                 </div>
               {:else}
                 <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                  <span class="text-gray-800">{@html sanitizeText(nombre || "No name")}</span>
+                  <span class="text-gray-800">{nombre || "No name"}</span>
                   <button
                     on:click={startEditing}
                     class="text-amber-600 hover:text-amber-700 transition-colors"
@@ -289,7 +289,7 @@
             <div class="space-y-2">
               <label for="email-display" class="block text-sm font-medium text-gray-700">Email</label>
               <div id="email-display" class="p-4 bg-gray-50 rounded-lg">
-                <span class="text-gray-800">{@html sanitizeText(email || "Not specified")}</span>
+                <span class="text-gray-800">{email || "Not specified"}</span>
               </div>
             </div>
 
@@ -297,7 +297,7 @@
             <div class="space-y-2">
               <label for="user-id-display" class="block text-sm font-medium text-gray-700">User ID</label>
               <div id="user-id-display" class="p-4 bg-gray-50 rounded-lg font-mono text-sm">
-                <span class="text-gray-600">{@html sanitizeText(id_usuario || "Not available")}</span>
+                <span class="text-gray-600">{id_usuario || "Not available"}</span>
               </div>
             </div>
 

@@ -1,8 +1,9 @@
 <script>
   import { nombre } from '$lib/stores/user.js';
   import { goto } from '$app/navigation';
+  import { onMount } from 'svelte';
 
-  // Configuración del backend Symfony (ajusta según tu setup)
+  
   const API_BASE_URL = import.meta.env.PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:8000';
 
   let email    = '';
@@ -12,11 +13,17 @@
   let loginAttempts = 0;
   const MAX_ATTEMPTS = 5;
 
-  // 🔄 FUNCIÓN ACTUALIZADA: Mueve la lógica de autenticación al Back-end
+  onMount(() => {
+    // Limpia el nombre de usuario al cargar la página de login
+    // para evitar mostrar datos de una sesión anterior.
+    nombre.set('');
+  });
+
+  
   async function handleLogin() {
     error = '';
 
-    // Client-side rate limiting
+    
     if (loginAttempts >= MAX_ATTEMPTS) {
       error = 'Demasiados intentos. Por favor, espera unos minutos.';
       return;
@@ -111,7 +118,7 @@
       <div>
         <div class="flex justify-between items-center">
           <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-          <a href="#" class="text-sm text-green-600 hover:underline">Forgot password?</a>
+          <a href="/forgot-password" class="text-sm text-green-600 hover:underline">Forgot password?</a>
         </div>
         <input
           id="password"

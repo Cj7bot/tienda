@@ -11,7 +11,7 @@
 
   let currentSlide = 0;
   let isTransitioning = false;
-  let autoPlayTimer: number | null = null;
+  let autoPlayTimer: ReturnType<typeof setInterval> | null = null;
   let sliderContainer: HTMLElement;
   let touchStartX = 0;
   let touchEndX = 0;
