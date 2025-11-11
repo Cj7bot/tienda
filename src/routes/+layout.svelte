@@ -12,6 +12,11 @@
   });
 </script>
 
+<svelte:head>
+  <!-- UserWay Accessibility Widget -->
+  <script src="https://cdn.userway.org/widget.js" data-account="gZrdxHz9Kn"></script>
+</svelte:head>
+
 <Header />
 <slot />
 <Footer />

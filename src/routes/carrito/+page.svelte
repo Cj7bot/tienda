@@ -23,25 +23,12 @@
     <div class="bg-white rounded-xl px-6 py-8 shadow-md flex flex-col items-center text-center max-w-md mx-auto">
       <img src="/medium-empty-cart.png" alt="Carrito vacío" class="w-24 h-24 mb-4" />
       <p class="text-2xl font-semibold text-gray-800 mb-2">Your cart is empty</p>
-      {#if !isLoggedIn}
-        <p class="text-base text-gray-600 mb-6 leading-relaxed">
-          Sign In to start adding products to your cart and enjoy exclusive offers and discounts.
-        </p>
-        <a href="/login" class="bg-gray-800 text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-gray-700 transition">
-          Sign In
-        </a>
-        <p class="text-xs text-gray-600 mt-3">
-          ¿Don't have an account?
-          <a href="/register" class="text-blue-600 underline ml-1">Register</a>
-        </p>
-      {:else}
-        <p class="text-base text-gray-600 mb-6 leading-relaxed">
-          Start adding products to your cart to see them here.
-        </p>
-        <a href="/productos" class="bg-green-600 text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-green-700 transition">
-          Browse Products
-        </a>
-      {/if}
+      <p class="text-base text-gray-600 mb-6 leading-relaxed">
+        Start adding products to your cart to see them here.
+      </p>
+      <a href="/productos" class="bg-green-600 text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-green-700 transition">
+        Browse Products
+      </a>
     </div>
   {:else}
     <!-- Carrito con productos -->

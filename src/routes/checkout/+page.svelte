@@ -69,7 +69,7 @@
       'La Libertad': {},
       'Lambayeque': {},
       'Lima': {
-        'Lima': ['Miraflores', 'San Isidro', 'Barranco', 'Santiago de Surco'],
+        'Lima': ['Breña','Comas','Lima Metropolitana','Lince','Lurin','Magdalena','Miraflores', 'San Isidro', 'Barranco', 'Santiago de Surco'],
         'Cañete': ['San Vicente de Cañete', 'Imperial', 'Mala']
       },
       'Loreto': {},
@@ -89,8 +89,8 @@
         'Broward': ['Fort Lauderdale', 'Hollywood', 'Pembroke Pines']
       },
       'California': {
-        'Los Angeles': ['Los Angeles', 'Santa Monica', 'Beverly Hills'],
-        'San Francisco': ['San Francisco']
+        'Los Angeles': ['Los Angeles', 'Santa Monica', 'Beverly Hills', 'Culver City', 'San Mateo', 'San Rafael'],
+        'San Francisco': ['San Francisco', 'Cupertino', 'Fremont', 'Hayward', 'Oakland', 'Palo Alto', 'San Jose', 'Santa Clara', 'Santa Cruz', 'Union City']
       }
     }
   };
@@ -310,7 +310,23 @@
           cmrTermsAccepted
         };
 
-        await processPayment(checkoutData);
+        const result = await processPayment(checkoutData);
+
+        // Mostrar información adicional en la consola
+        console.log('='.repeat(50));
+        console.log('📊 RESUMEN DEL PEDIDO');
+        console.log('='.repeat(50));
+        console.log('🆔 Order ID:', result.orderId || result.order_id);
+        console.log('📧 Email enviado:', result.emailSent ? '✅ Sí' : '❌ No');
+        if (result.emailError) {
+          console.error('❌ Error del email:', result.emailError);
+        }
+        console.log('='.repeat(50));
+
+        // Alertar al usuario si el email falló
+        if (!result.emailSent) {
+          alert('Pedido creado exitosamente, pero no se pudo enviar el comprobante por email. Contacta a soporte.');
+        }
 
         // Limpiar el carrito después de una compra exitosa
         cart.set([]);
